@@ -1,135 +1,116 @@
-import { useState } from 'react';
-import { Row, Col, Card } from 'react-bootstrap';
-import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
+import { useState, useEffect } from 'react';
+import ChartCard from '../components/charts/ChartCard';
+import StatisticsCard from '../components/charts/StatisticsCard';
+import { fetchStockData, fetchMarketOverview, fetchDailyMetrics } from '../services/api';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+function Dashboard() {
+  const [stockData, setStockData] = useState(null);
+  const [marketData, setMarketData] = useState(null);
+  const [metrics, setMetrics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-const Dashboard = () => {
-  const [salesData] = useState({
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-      {
-        label: 'Sales',
-        data: [450, 200, 100, 220, 500, 100],
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.4,
-      },
-    ],
-  });
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [stockResponse, marketResponse, metricsResponse] = await Promise.all([
+          fetchStockData(),
+          fetchMarketOverview(),
+          fetchDailyMetrics()
+        ]);
 
-  const [usersData] = useState({
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-      {
-        label: 'Active Users',
-        data: [320, 340, 365, 360, 370, 385],
-        borderColor: 'rgb(203, 12, 159)',
-        tension: 0.4,
-      },
-    ],
-  });
+        setStockData(stockResponse);
+        setMarketData(marketResponse);
+        setMetrics(metricsResponse);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top',
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-      },
-    },
-  };
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <div className="text-center py-5">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center py-5 text-danger">Error: {error}</div>;
+  }
 
   return (
     <>
-      <Row className="mb-4">
-        <Col lg={3} sm={6}>
-          <Card className="mb-4">
-            <Card.Body>
-              <Row>
-                <Col xs={8}>
-                  <div className="numbers">
-                    <p className="text-sm mb-0 text-uppercase font-weight-bold">Today&apos;s Money</p>
-                    <h5 className="font-weight-bolder mb-0">
-                      $53,000
-                      <span className="text-success text-sm font-weight-bolder">+55%</span>
-                    </h5>
-                  </div>
-                </Col>
-                <Col xs={4} className="text-end">
-                  <div className="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
-                    <i className="fas fa-money-bill text-lg opacity-10" aria-hidden="true"></i>
-                  </div>
-                </Col>
-              </Row>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col lg={3} sm={6}>
-          <Card className="mb-4">
-            <Card.Body>
-              <Row>
-                <Col xs={8}>
-                  <div className="numbers">
-                    <p className="text-sm mb-0 text-uppercase font-weight-bold">Today&apos;s Users</p>
-                    <h5 className="font-weight-bolder mb-0">
-                      2,300
-                      <span className="text-success text-sm font-weight-bolder">+3%</span>
-                    </h5>
-                  </div>
-                </Col>
-                <Col xs={4} className="text-end">
-                  <div className="icon icon-shape bg-gradient-danger shadow text-center border-radius-md">
-                    <i className="fas fa-users text-lg opacity-10" aria-hidden="true"></i>
-                  </div>
-                </Col>
-              </Row>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+      <div className="row">
+        {metrics.map((metric, index) => (
+          <div className="col-xl-3 col-sm-6 mb-4" key={metric.symbol}>
+            <StatisticsCard
+              title={metric.symbol}
+              value={`$${metric.price}`}
+              percentage={parseFloat(metric.percentChange)}
+              icon="ni ni-money-coins"
+              color={index % 2 === 0 ? 'primary' : 'success'}
+            />
+          </div>
+        ))}
+      </div>
 
-      <Row>
-        <Col lg={6}>
-          <Card className="mb-4">
-            <Card.Body>
-              <h6>Sales Overview</h6>
-              <Line options={chartOptions} data={salesData} />
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col lg={6}>
-          <Card className="mb-4">
-            <Card.Body>
-              <h6>Users Overview</h6>
-              <Line options={chartOptions} data={usersData} />
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+      <div className="row mt-4">
+        <div className="col-lg-7 mb-4">
+          <ChartCard
+            title="Stock Performance"
+            description="Daily closing prices for the last 30 days"
+            chart={{
+              type: 'line',
+              data: stockData
+            }}
+            statistics={[
+              {
+                title: 'Volume',
+                value: stockData?.volume || '0',
+                icon: 'ni ni-money-coins',
+                color: 'primary',
+                progress: 60
+              },
+              {
+                title: 'Change',
+                value: `${stockData?.change || '0'}%`,
+                icon: 'ni ni-paper-diploma',
+                color: 'info',
+                progress: Math.abs(stockData?.change || 0)
+              },
+              {
+                title: 'High',
+                value: stockData?.high || '0',
+                icon: 'ni ni-cart',
+                color: 'warning',
+                progress: 75
+              },
+              {
+                title: 'Low',
+                value: stockData?.low || '0',
+                icon: 'ni ni-shop',
+                color: 'danger',
+                progress: 30
+              }
+            ]}
+          />
+        </div>
+        <div className="col-lg-5 mb-4">
+          <ChartCard
+            title="Market Overview"
+            description="Sector performance comparison"
+            chart={{
+              type: 'bar',
+              data: marketData
+            }}
+          />
+        </div>
+      </div>
     </>
   );
-};
+}
 
 export default Dashboard; 

@@ -1,31 +1,52 @@
-import { Navbar as BsNavbar, Container, Form, InputGroup } from 'react-bootstrap';
+import { useLocation } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
-const Navbar = () => {
+function Navbar({ onSidebarToggle }) {
+  const location = useLocation();
+
+  const getPageName = () => {
+    switch (location.pathname) {
+      case '/':
+        return 'Dashboard';
+      case '/tables':
+        return 'Tables';
+      default:
+        return '';
+    }
+  };
+
   return (
-    <BsNavbar className="navbar px-0 mx-4 shadow-none border-radius-xl" expand="lg">
-      <Container fluid>
+    <nav className="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div className="container-fluid py-1 px-3">
+        <nav aria-label="breadcrumb">
+          <ol className="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+            <li className="breadcrumb-item text-sm">
+              <a className="opacity-5 text-dark" href="#">Pages</a>
+            </li>
+            <li className="breadcrumb-item text-sm text-dark active" aria-current="page">{getPageName()}</li>
+          </ol>
+          <h6 className="font-weight-bolder mb-0">{getPageName()}</h6>
+        </nav>
         <div className="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
           <div className="ms-md-auto pe-md-3 d-flex align-items-center">
-            <InputGroup>
-              <InputGroup.Text className="bg-white border-end-0">
-                <i className="fas fa-search"></i>
-              </InputGroup.Text>
-              <Form.Control
-                type="text"
-                className="border-start-0"
-                placeholder="Type here..."
-              />
-            </InputGroup>
+            <div className="input-group">
+              <input type="text" className="form-control" placeholder="Type here..." />
+            </div>
           </div>
           <ul className="navbar-nav justify-content-end">
-            <li className="nav-item d-flex align-items-center">
-              <a href="#" className="nav-link text-body font-weight-bold px-0">
-                <i className="fa fa-user me-sm-1"></i>
-                <span className="d-sm-inline d-none">Sign In</span>
-              </a>
+            <li className="nav-item d-flex align-items-center me-3">
+              <button className="btn btn-outline-warning btn-sm mb-0">Online Builder</button>
+            </li>
+            <li className="nav-item d-flex align-items-center me-3">
+              <a href="#" className="nav-link text-body font-weight-bold px-0">Sign In</a>
             </li>
             <li className="nav-item d-xl-none ps-3 d-flex align-items-center">
-              <a href="#" className="nav-link text-body p-0" id="iconNavbarSidenav">
+              <a 
+                href="javascript:;" 
+                className="nav-link text-body p-0" 
+                id="iconNavbarSidenav"
+                onClick={onSidebarToggle}
+              >
                 <div className="sidenav-toggler-inner">
                   <i className="sidenav-toggler-line"></i>
                   <i className="sidenav-toggler-line"></i>
@@ -33,21 +54,15 @@ const Navbar = () => {
                 </div>
               </a>
             </li>
-            <li className="nav-item px-3 d-flex align-items-center">
-              <a href="#" className="nav-link text-body p-0">
-                <i className="fa fa-cog fixed-plugin-button-nav cursor-pointer"></i>
-              </a>
-            </li>
-            <li className="nav-item dropdown pe-2 d-flex align-items-center">
-              <a href="#" className="nav-link text-body p-0" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                <i className="fa fa-bell cursor-pointer"></i>
-              </a>
-            </li>
           </ul>
         </div>
-      </Container>
-    </BsNavbar>
+      </div>
+    </nav>
   );
+}
+
+Navbar.propTypes = {
+  onSidebarToggle: PropTypes.func.isRequired
 };
 
-export default Navbar; 
+export default Navbar;
