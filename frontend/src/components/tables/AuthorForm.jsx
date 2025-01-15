@@ -15,7 +15,11 @@ function AuthorForm({ show, author, onClose, onSubmit }) {
 
   useEffect(() => {
     if (author) {
-      setFormData(author);
+      const employed = author.employed ? new Date(author.employed).toISOString().split('T')[0] : '';
+      setFormData({
+        ...author,
+        employed
+      });
     } else {
       setFormData({
         name: '',
@@ -86,15 +90,18 @@ function AuthorForm({ show, author, onClose, onSubmit }) {
 
             <Form.Group className="mb-3">
               <Form.Label>Function</Form.Label>
-              <Form.Control
-                type="text"
+              <Form.Select
                 name="function"
                 value={formData.function}
                 onChange={handleChange}
-                placeholder="Enter function"
                 className="form-control-lg"
                 required
-              />
+              >
+                <option value="">Select function</option>
+                <option value="Manager">Manager</option>
+                <option value="Developer">Developer</option>
+                <option value="Designer">Designer</option>
+              </Form.Select>
             </Form.Group>
 
             <Form.Group className="mb-3">

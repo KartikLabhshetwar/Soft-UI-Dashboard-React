@@ -1,88 +1,127 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://www.alphavantage.co/query';
-const ALPHA_VANTAGE_API_KEY = import.meta.env.VITE_ALPHA_VANTAGE_API_KEY;
+// Maintain local state for authors
+let authors = [];
 
-const MOCK_STOCK_DATA = {
-  AAPL: {
-    prices: [150.23, 151.45, 149.89, 152.34, 153.21],
-    volume: 1234567,
-    change: 2.5
-  },
-  GOOGL: {
-    prices: [2750.12, 2780.45, 2795.67, 2810.23, 2830.45],
-    volume: 987654,
-    change: 1.8
-  }
+const formatDate = (date) => {
+  if (!date) return '';
+  const d = new Date(date);
+  return d.toLocaleDateString();
 };
 
-export const fetchStockData = async () => {
+export const fetchAuthors = async () => {
   try {
-    // For development, return mock data
-    return MOCK_STOCK_DATA;
-
-    // When ready for real API:
-    // const response = await axios.get('your-stock-api-endpoint');
-    // return response.data || MOCK_STOCK_DATA;
+    const response = await axios.get('https://jsonplaceholder.typicode.com/users');
+    authors = response.data.map(user => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      function: ['Manager', 'Developer', 'Designer'][Math.floor(Math.random() * 3)],
+      organization: user.company.name,
+      status: Math.random() > 0.5 ? 'Online' : 'Offline',
+      employed: formatDate(Date.now() - Math.random() * 31536000000),
+      image: `/assets/img/team-${(user.id % 4) + 1}.jpg`
+    }));
+    return authors;
   } catch (error) {
-    console.error('Error fetching stock data:', error);
-    return MOCK_STOCK_DATA; // Fallback to mock data on error
+    console.error('Error fetching authors:', error);
+    return [];
   }
 };
 
-export const fetchMarketOverview = async () => {
+export const addAuthor = async (authorData) => {
   try {
-    const response = await axios.get(`${BASE_URL}`, {
-      params: {
-        function: 'SECTOR',
-        apikey: ALPHA_VANTAGE_API_KEY
-      }
-    });
+    const response = await axios.post('https://jsonplaceholder.typicode.com/users', authorData);
+    const newId = response.data.id || Date.now();
+    const newAuthor = {
+      ...authorData,
+      id: newId,
+      employed: formatDate(authorData.employed),
+      image: `/assets/img/team-${(newId % 4) + 1}.jpg` // Add a default image
+    };
+    authors = [...authors, newAuthor];
+    return newAuthor;
+  } catch {
+    // Even if the API call fails, we'll still add the author locally
+    // since we're using a mock API
+    const newId = Date.now();
+    const newAuthor = {
+      ...authorData,
+      id: newId,
+      employed: formatDate(authorData.employed),
+      image: `/assets/img/team-${(newId % 4) + 1}.jpg`
+    };
+    authors = [...authors, newAuthor];
+    return newAuthor;
+  }
+};
 
-    const sectorData = response.data['Rank A: Real-Time Performance'];
-    const sectors = Object.keys(sectorData);
-    const performance = sectors.map(sector => parseFloat(sectorData[sector].replace('%', '')));
+export const updateAuthor = async (authorData) => {
+  try {
+    await axios.put(`https://jsonplaceholder.typicode.com/users/${authorData.id}`, authorData);
+    const updatedAuthor = {
+      ...authorData,
+      employed: formatDate(authorData.employed),
+      image: authorData.image || `/assets/img/team-${(authorData.id % 4) + 1}.jpg`
+    };
+    authors = authors.map(author => author.id === authorData.id ? updatedAuthor : author);
+    return updatedAuthor;
+  } catch {
+    // Even if the API call fails, we'll still update the author locally
+    // since we're using a mock API
+    const updatedAuthor = {
+      ...authorData,
+      employed: formatDate(authorData.employed),
+      image: authorData.image || `/assets/img/team-${(authorData.id % 4) + 1}.jpg`
+    };
+    authors = authors.map(author => author.id === authorData.id ? updatedAuthor : author);
+    return updatedAuthor;
+  }
+};
+
+export const deleteAuthor = async (id) => {
+  try {
+    await axios.delete(`https://jsonplaceholder.typicode.com/users/${id}`);
+    authors = authors.filter(author => author.id !== id);
+    return true;
+  } catch {
+    // Even if the API call fails, we'll still delete the author locally
+    // since we're using a mock API
+    authors = authors.filter(author => author.id !== id);
+    return true;
+  }
+};
+
+export const fetchUserStats = async () => {
+  try {
+    // Using JSONPlaceholder data for stats
+    const [users, posts, comments] = await Promise.all([
+      axios.get('https://jsonplaceholder.typicode.com/users'),
+      axios.get('https://jsonplaceholder.typicode.com/posts'),
+      axios.get('https://jsonplaceholder.typicode.com/comments')
+    ]);
 
     return {
-      labels: sectors,
-      datasets: [{
-        label: 'Sector Performance',
-        data: performance,
-        backgroundColor: '#cb0c9f',
-        borderRadius: 5
-      }]
+      activeUsers: users.data.length * 160,
+      activeUsersIncrease: 55,
+      clicks: posts.data.length * 35,
+      clicksIncrease: 124,
+      purchases: Math.floor(comments.data.length / 2),
+      purchasesIncrease: 15,
+      likes: comments.data.length,
+      likesIncrease: 90
     };
   } catch (error) {
-    console.error('Error fetching market overview:', error);
-    throw error;
-  }
-};
-
-export const fetchDailyMetrics = async () => {
-  try {
-    const symbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN'];
-    const promises = symbols.map(symbol => 
-      axios.get(`${BASE_URL}`, {
-        params: {
-          function: 'GLOBAL_QUOTE',
-          symbol,
-          apikey: ALPHA_VANTAGE_API_KEY
-        }
-      })
-    );
-
-    const responses = await Promise.all(promises);
-    return responses.map((response, index) => {
-      const quote = response.data['Global Quote'];
-      return {
-        symbol: symbols[index],
-        price: parseFloat(quote['05. price']).toFixed(2),
-        change: parseFloat(quote['09. change']).toFixed(2),
-        percentChange: parseFloat(quote['10. change percent']).toFixed(2)
-      };
-    });
-  } catch (error) {
-    console.error('Error fetching daily metrics:', error);
-    throw error;
+    console.error('Error fetching user stats:', error);
+    return {
+      activeUsers: 1600,
+      activeUsersIncrease: 55,
+      clicks: 357,
+      clicksIncrease: 124,
+      purchases: 2300,
+      purchasesIncrease: 15,
+      likes: 940,
+      likesIncrease: 90
+    };
   }
 };
