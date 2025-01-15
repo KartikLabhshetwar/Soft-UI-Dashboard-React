@@ -19,6 +19,21 @@
   --color-gray-800: #343a40;
   --color-gray-900: #212529;
 
+  /* Chart Colors */
+  --chart-line-color: #000000;
+  --chart-grid-color: rgba(0, 0, 0, 0.05);
+  --chart-text-color: #67748e;
+  --chart-background: var(--color-white);
+  --chart-area-opacity: 0.05;
+  --chart-line-width: 2px;
+  --chart-point-radius: 0px;
+  --chart-tension: 0.15;
+  --chart-font-family: 'Open Sans', sans-serif;
+  --chart-font-size: 12px;
+  --chart-font-weight: 400;
+  --chart-line-height: 1.5;
+  --chart-padding: 8px;
+
   /* Gradients */
   --gradient-primary: linear-gradient(310deg, #7928CA, #FF0080);
   --gradient-secondary: linear-gradient(310deg, #627594, #A8B8D8);
@@ -267,5 +282,109 @@ body {
   .table td, .table th {
     padding: 0.5rem;
     font-size: 0.875rem;
+  }
+}
+
+/* Chart Styles */
+.chart-card {
+  background: var(--chart-background);
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 27px 0 rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+}
+
+.chart-container {
+  background-color: var(--chart-background);
+  padding: 1rem 0.5rem;
+  height: 300px;
+  position: relative;
+}
+
+/* Sales Overview Chart Specific Styles */
+.sales-chart {
+  --chart-border-color: var(--chart-line-color);
+  --chart-background-color: rgba(0, 0, 0, 0.05);
+}
+
+.sales-overview-chart {
+  background-color: var(--chart-background);
+  padding: 0;
+}
+
+.chart-header {
+  padding: 0;
+}
+
+.chart-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--color-gray-200);
+}
+
+.sales-overview-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-dark);
+  margin-bottom: 0.25rem;
+}
+
+.chart-subtitle {
+  font-size: 0.875rem;
+  color: var(--color-gray-600);
+  margin-bottom: 1rem;
+}
+
+.chart-subtitle .font-weight-bold {
+  color: var(--color-success);
+}
+
+.chart-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 1rem;
+}
+
+.chart-stat-label {
+  font-size: 0.875rem;
+  color: var(--color-gray-700);
+  font-weight: 600;
+}
+
+.chart-stat-value {
+  font-size: 0.875rem;
+  color: var(--color-gray-600);
+}
+
+.horizontal.dark {
+  border-color: var(--color-gray-200);
+  margin: 1rem 0;
+  opacity: 1;
+}
+
+/* Chart Grid Styles */
+.sales-chart .chartjs-grid-line {
+  stroke: var(--chart-grid-color);
+  stroke-width: 1;
+  stroke-dasharray: 5, 5;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .chart-container {
+    height: 250px;
+  }
+  
+  .chart-footer {
+    padding: 1rem;
+  }
+  
+  .sales-overview-title {
+    font-size: 0.875rem;
+  }
+  
+  .chart-subtitle,
+  .chart-stat-label,
+  .chart-stat-value {
+    font-size: 0.75rem;
   }
 }

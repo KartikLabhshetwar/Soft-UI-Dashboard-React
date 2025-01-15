@@ -6,11 +6,11 @@ const StatCard = ({ title, value, increase, icon, color }) => (
       <div className="row">
         <div className="col-8">
           <div className="numbers">
-            <p className="text-white text-sm mb-0 text-capitalize font-weight-bold">{title}</p>
-            <h5 className="text-white font-weight-bolder mb-0">
+            <p className="text-sm mb-0 text-capitalize font-weight-bold opacity-7">{title}</p>
+            <h5 className="font-weight-bolder mb-0 text-white">
               {value}
               {increase && (
-                <span className="text-success text-sm font-weight-bolder">
+                <span className="text-success text-sm font-weight-bolder ms-2">
                   +{increase}%
                 </span>
               )}
@@ -18,8 +18,8 @@ const StatCard = ({ title, value, increase, icon, color }) => (
           </div>
         </div>
         <div className="col-4 text-end">
-          <div className="icon icon-shape bg-white shadow text-center border-radius-md">
-            <i className={`${icon} text-dark text-lg opacity-10`} aria-hidden="true"></i>
+          <div className="icon icon-shape bg-white shadow text-center border-radius-md d-flex align-items-center justify-content-center">
+            <i className={icon} style={{ fontSize: '1.25rem', color: '#344767' }}></i>
           </div>
         </div>
       </div>
@@ -41,29 +41,29 @@ function StatsCards({ stats }) {
       title: 'Users Active',
       value: stats.activeUsers.toLocaleString(),
       increase: stats.activeUsersIncrease,
-      icon: 'ni ni-circle-08',
+      icon: 'fas fa-users',
       color: 'primary'
     },
     {
       title: 'Click Events',
       value: stats.clicks.toLocaleString(),
       increase: stats.clicksIncrease,
-      icon: 'ni ni-like-2',
-      color: 'dark'
+      icon: 'fas fa-mouse-pointer',
+      color: 'info'
     },
     {
-      title: 'Purchases',
-      value: stats.purchases.toLocaleString(),
+      title: 'Sales',
+      value: `$${stats.purchases.toLocaleString()}`,
       increase: stats.purchasesIncrease,
-      icon: 'ni ni-cart',
-      color: 'dark'
+      icon: 'fas fa-shopping-cart',
+      color: 'success'
     },
     {
-      title: 'Likes',
+      title: 'Performance',
       value: stats.likes.toLocaleString(),
       increase: stats.likesIncrease,
-      icon: 'ni ni-favourite-28',
-      color: 'dark'
+      icon: 'fas fa-chart-line',
+      color: 'warning'
     }
   ];
 

@@ -37,13 +37,11 @@ export const addAuthor = async (authorData) => {
       ...authorData,
       id: newId,
       employed: formatDate(authorData.employed),
-      image: `/assets/img/team-${(newId % 4) + 1}.jpg` // Add a default image
+      image: `/assets/img/team-${(newId % 4) + 1}.jpg`
     };
     authors = [...authors, newAuthor];
     return newAuthor;
   } catch {
-    // Even if the API call fails, we'll still add the author locally
-    // since we're using a mock API
     const newId = Date.now();
     const newAuthor = {
       ...authorData,
@@ -67,8 +65,6 @@ export const updateAuthor = async (authorData) => {
     authors = authors.map(author => author.id === authorData.id ? updatedAuthor : author);
     return updatedAuthor;
   } catch {
-    // Even if the API call fails, we'll still update the author locally
-    // since we're using a mock API
     const updatedAuthor = {
       ...authorData,
       employed: formatDate(authorData.employed),
@@ -85,8 +81,6 @@ export const deleteAuthor = async (id) => {
     authors = authors.filter(author => author.id !== id);
     return true;
   } catch {
-    // Even if the API call fails, we'll still delete the author locally
-    // since we're using a mock API
     authors = authors.filter(author => author.id !== id);
     return true;
   }
@@ -94,7 +88,6 @@ export const deleteAuthor = async (id) => {
 
 export const fetchUserStats = async () => {
   try {
-    // Using JSONPlaceholder data for stats
     const [users, posts, comments] = await Promise.all([
       axios.get('https://jsonplaceholder.typicode.com/users'),
       axios.get('https://jsonplaceholder.typicode.com/posts'),
@@ -122,6 +115,95 @@ export const fetchUserStats = async () => {
       purchasesIncrease: 15,
       likes: 940,
       likesIncrease: 90
+    };
+  }
+};
+
+export const fetchSalesData = async () => {
+  try {
+    const response = await axios.get('https://jsonplaceholder.typicode.com/posts');
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    return {
+      labels: months,
+      datasets: [{
+        label: 'Sales',
+        data: response.data.slice(0, 6).map(() => Math.floor(Math.random() * 1000 + 500)),
+        borderColor: '#cb0c9f',
+        tension: 0.4
+      }]
+    };
+  } catch {
+    return {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [{
+        label: 'Sales',
+        data: [450, 580, 690, 890, 750, 920],
+        borderColor: '#cb0c9f',
+        tension: 0.4
+      }]
+    };
+  }
+};
+
+export const fetchTasks = async () => {
+  try {
+    const response = await axios.get('https://jsonplaceholder.typicode.com/todos?_limit=5');
+    return response.data.map(todo => ({
+      id: todo.id,
+      title: todo.title,
+      status: todo.completed ? 'done' : Math.random() > 0.5 ? 'pending' : 'scheduled',
+      date: formatDate(Date.now() - Math.random() * 604800000) // Random date within last week
+    }));
+  } catch {
+    return [
+      { id: 1, title: 'New dashboard design', status: 'done', date: formatDate(Date.now() - 86400000) },
+      { id: 2, title: 'Implement user authentication', status: 'pending', date: formatDate(Date.now()) },
+      { id: 3, title: 'API integration', status: 'scheduled', date: formatDate(Date.now() + 86400000) }
+    ];
+  }
+};
+
+export const fetchOrders = async () => {
+  try {
+    const response = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=6');
+    return response.data.map(post => ({
+      id: post.id,
+      item: `Order #${post.id}`,
+      date: formatDate(Date.now() - Math.random() * 604800000),
+      status: ['Paid', 'Refunded', 'Pending'][Math.floor(Math.random() * 3)],
+      customer: post.title.split(' ').slice(0, 2).join(' '),
+      revenue: Math.floor(Math.random() * 1000 + 100)
+    }));
+  } catch {
+    return [
+      { id: 1, item: 'Order #1', date: formatDate(Date.now()), status: 'Paid', customer: 'John Doe', revenue: 780 },
+      { id: 2, item: 'Order #2', date: formatDate(Date.now()), status: 'Pending', customer: 'Jane Smith', revenue: 590 }
+    ];
+  }
+};
+
+export const fetchReviews = async () => {
+  try {
+    const response = await axios.get('https://jsonplaceholder.typicode.com/comments?_limit=100');
+    const total = response.data.length;
+    return {
+      reviews: {
+        'Positive Reviews': Math.floor((Math.random() * 20) + 70), // 70-90%
+        'Neutral Reviews': Math.floor(Math.random() * 20), // 0-20%
+        'Negative Reviews': Math.floor(Math.random() * 10) // 0-10%
+      },
+      developers: total * 15,
+      projects: total * 8
+    };
+  } catch {
+    return {
+      reviews: {
+        'Positive Reviews': 80,
+        'Neutral Reviews': 15,
+        'Negative Reviews': 5
+      },
+      developers: 1500,
+      projects: 800
     };
   }
 };

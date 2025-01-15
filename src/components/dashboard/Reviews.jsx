@@ -32,7 +32,7 @@ function Reviews({ stats }) {
         </div>
         <div className="mt-4">
           <p className="text-sm">
-            More than <span className="font-weight-bold">{stats.developers.toLocaleString()}</span> developers used Creative Tim&apos;s products and over{' '}
+            More than <span className="font-weight-bold">{stats.developers.toLocaleString()}</span> developers used Kartik Labhshetwar products and over{' '}
             <span className="font-weight-bold">{stats.projects.toLocaleString()}</span> projects were created.
           </p>
           <button className="btn btn-dark btn-sm w-100">View all reviews</button>
