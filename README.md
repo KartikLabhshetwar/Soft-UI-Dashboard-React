@@ -35,24 +35,16 @@ A modern and fully functional dashboard built with React JS, featuring dynamic c
   - Organization
   - Employment Status
   - Join Date
+ 
+## 📹 Demo Video
 
-### Additional Components
+[Watch the Demo Video](your-video-link-here)
 
-- **Reviews Section**
-  - Progress bars for review categories
-  - Positive/Neutral/Negative review tracking
-  - Developer statistics
-
-- **Task Management**
-  - Task listing with status
-  - Timeline view
-  - Priority indicators
 
 ## 🚀 Technologies Used
 
 - **Frontend Framework**
   - React 18.2.0
-  - Vite for build tooling
 
 - **UI Components**
   - Bootstrap 5
@@ -131,11 +123,6 @@ The dashboard is fully responsive and optimized for:
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-
-## 📹 Demo Video
-
-[Watch the Demo Video](your-video-link-here)
 
 ## 📄 License
 
