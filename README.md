@@ -36,10 +36,6 @@ A modern and fully functional dashboard built with React JS, featuring dynamic c
   - Employment Status
   - Join Date
  
-## 📹 Demo Video
-
-https://github.com/user-attachments/assets/9999163a-27be-4c5a-b9e5-00ab6afc1fbb
-
 ## 🚀 Technologies Used
 
 - **Frontend Framework**
